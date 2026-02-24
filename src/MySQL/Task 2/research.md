@@ -1,84 +1,52 @@
-# SQL Research Questions
+# Database Research Questions
 
----
+## 1. What is the difference between a DBMS and an RDBMS?
 
-## 1. WHERE vs HAVING
+**DBMS (Database Management System)** is a general software system that allows users to create, manage, and manipulate databases. It can store data in various formats including hierarchical, network, or file-based structures.
 
-Both filter data, but at different stages:
+**RDBMS (Relational Database Management System)** is a specific type of DBMS that stores data in tables (relations) with rows and columns. The key difference is that RDBMS organizes data based on the relational model, where tables can be linked through relationships using keys (primary keys and foreign keys).
 
-- **WHERE** filters **rows** before any grouping happens.
-- **HAVING** filters **groups** after `GROUP BY` has been applied.
+**Key Differences:**
+- RDBMS uses structured tables with relationships between them, while DBMS can use various data models
+- RDBMS follows ACID properties (Atomicity, Consistency, Isolation, Durability) more strictly
+- RDBMS supports SQL for querying, while DBMS may use different query languages
+- Examples: MySQL, PostgreSQL, Oracle (RDBMS) vs. XML databases, file systems (DBMS)
 
-> Simple rule: If you're filtering on a raw column → use `WHERE`. If you're filtering on an aggregate (like `SUM`, `COUNT`) → use `HAVING`.
+## 2. What is the difference between DDL and DML?
 
-```sql
-SELECT department, COUNT(*) AS total_employees
-FROM employees
-WHERE salary > 3000          -- filters individual rows first
-GROUP BY department
-HAVING COUNT(*) > 5;         -- filters groups after aggregation
-```
+**DDL (Data Definition Language)** is used to define and modify the structure of database objects like tables, schemas, and indexes. It deals with the database schema and structure.
 
----
+**DML (Data Manipulation Language)** is used to manipulate the actual data within the database tables. It deals with inserting, updating, deleting, and retrieving data.
 
-## 2. DELETE vs TRUNCATE vs DROP
+**Example Commands:**
 
-| Command | What it does | Can be Rolled Back? |
-|---|---|---|
-| `DELETE` | Removes specific rows (can use `WHERE`) | ✅ Yes |
-| `TRUNCATE` | Removes **all** rows quickly, keeps the table structure | ❌ No (in most databases) |
-| `DROP` | Removes the **entire table** (structure + data) | ❌ No |
+- **DDL Example:**
+  ```sql
+  CREATE TABLE Students (
+      StudentID INT PRIMARY KEY,
+      Name VARCHAR(100),
+      Age INT
+  );
+  ```
+  This command creates the structure of a table.
 
-- Use `DELETE` when you need to remove specific rows or need the option to undo.
-- Use `TRUNCATE` when you want to empty a table fast.
-- Use `DROP` when you want to completely get rid of the table.
+- **DML Example:**
+  ```sql
+  INSERT INTO Students (StudentID, Name, Age)
+  VALUES (1, 'John Doe', 20);
+  ```
+  This command adds actual data into the table.
 
----
+## 3. Why is Normalization important for a large system like a university database?
 
-## 3. Logical Order of Execution
+Normalization is crucial for a university database because it helps keep the data organized and efficient. Here's why in simple terms:
 
-Even though we *write* a query in this order:
-`SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY`
+**Prevents Data Duplication:** Without normalization, you might store the same student information multiple times across different tables (like repeating student names and addresses in enrollment records, grade records, etc.). This wastes storage space and makes the database larger than necessary.
 
-The SQL engine *executes* it in this order:
+**Ensures Data Consistency:** Imagine if a student's phone number was stored in five different places. If they change their number and you only update it in one place, you'll have conflicting information. Normalization ensures each piece of information is stored in one place, so updates only need to happen once.
 
-1. `FROM` – identify the table(s)
-2. `WHERE` – filter individual rows
-3. `GROUP BY` – group the remaining rows
-4. `HAVING` – filter the groups
-5. `SELECT` – choose which columns to return
-6. `ORDER BY` – sort the final result
+**Makes Updates Easier:** In a university system with thousands of students, courses, and records, updating information needs to be simple. If data is normalized, changing a professor's office number means updating just one record, not hundreds.
 
-This is why you **cannot use a SELECT alias in a WHERE clause** — the alias doesn't exist yet when WHERE is processed.
+**Reduces Errors:** When data isn't duplicated unnecessarily, there's less chance of making mistakes or having inconsistent information. For example, you won't accidentally have the same course listed with two different credit hours in different places.
 
----
-
-## 4. COUNT(*) vs COUNT(Column_Name)
-
-- **`COUNT(*)`** counts **all rows**, including rows with NULL values.
-- **`COUNT(column_name)`** counts only rows where that column is **not NULL**.
-
-```sql
--- Table has 5 rows, but 2 have NULL in the 'phone' column
-
-SELECT COUNT(*)     FROM users;  -- returns 5
-SELECT COUNT(phone) FROM users;  -- returns 3
-```
-
-Use `COUNT(*)` to count total rows. Use `COUNT(column)` when you only want to count non-missing values in a specific field.
-
----
-
-## 5. CHAR vs VARCHAR
-
-Both store text, but they handle storage differently:
-
-- **`CHAR(10)`** is **fixed-length**. It always uses exactly 10 characters of space. If you store "Cat" (3 chars), it pads the rest with spaces → `"Cat       "`.
-- **`VARCHAR(10)`** is **variable-length**. It only uses as much space as needed. Storing "Cat" uses just 3 characters of space → `"Cat"`.
-
-| | CHAR(10) storing "Cat" | VARCHAR(10) storing "Cat" |
-|---|---|---|
-| Space used | 10 characters (padded) | 3 characters only |
-| Good for | Fixed-size data (e.g. country codes, gender flags) | Variable-size data (e.g. names, emails) |
-
-> Use `CHAR` when all values will have the same length. Use `VARCHAR` for everything else to save storage space.
+In short, for a large system like a university database with many students, courses, faculty, and departments, normalization keeps everything clean, organized, and manageable.
