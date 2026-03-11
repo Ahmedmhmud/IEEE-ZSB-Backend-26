@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCore - Register</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <h1>Student Signup Form</h1>
+    <nav>
+            <a href="index.html">Home</a>
+            <a href="register.html">Register</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="contact.html">Contact</a>
+    </nav>
+
+    <form action="/register" method="post">
+            <input type="text" id="full-name" name="full_name" placeholder="Full name" required>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="date" id="dob" name="date_of_birth" placeholder="Date of Birth" required>
+            <select id="department" name="department" placeholder="Department" required>
+                <option value="">Select Department</option>
+                <option value="cs">CS</option>
+                <option value="it">IT</option>
+                <option value="is">IS</option>
+            </select>
+
+        <fieldset>
+            <legend>Gender:</legend>
+            <label><input type="radio" name="gender" value="male" required>Male</label>
+            <label><input type="radio" name="gender" value="female">Female</label>
+        </fieldset>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
